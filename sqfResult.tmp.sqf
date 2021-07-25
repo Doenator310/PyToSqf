@@ -1,4 +1,4 @@
-getAllLootMarkers = {
+GetAllLootMarkers = {
    private _markerList = [];
    {
       private _marker = _x;
@@ -10,8 +10,8 @@ getAllLootMarkers = {
    if (true) exitWith {_markerList};
    
 };
-private _lootMarkerList =  call getAllLootMarkers;
-systemchat(str( call getAllLootMarkers));
+private _lootMarkerList =  call GetAllLootMarkers;
+systemchat(str( call GetAllLootMarkers));
 systemchat("TEEEEST!");
 {
    private _marker = _x;
@@ -28,3 +28,5 @@ if (isNil("SOME_MODULE_LOADED") == true) then {
 };
 private _fun = 1;
 waitUntil {(_fun > 1)&&(_fun == 0)};
+["A","B","C"]  spawn(GetAllLootMarkers);
+[]  spawn(GetAllLootMarkers);

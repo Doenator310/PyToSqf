@@ -1,4 +1,4 @@
-def getAllLootMarkers():
+def GetAllLootMarkers():
     markerList = []
     for marker in ENGINE.allMapMarkers:
         if "AIRDROP" in marker:
@@ -6,9 +6,9 @@ def getAllLootMarkers():
     ENGINE.systemchat(str(len(markerList)))
     return markerList
 
-lootMarkerList = getAllLootMarkers()
+lootMarkerList = GetAllLootMarkers()
 
-ENGINE.systemchat(str(getAllLootMarkers()))
+ENGINE.systemchat(str(GetAllLootMarkers()))
 ENGINE.systemchat("TEEEEST!")
 for marker in lootMarkerList:
     marker.setMarkerColor("ColorYellow");
@@ -23,7 +23,8 @@ if(isNil("SOME_MODULE_LOADED") == True):
 
 fun = 1
 await (fun > 1 and fun == 0);
-
+ENGINE.spawn(GetAllLootMarkers, "A", "B","C")
+ENGINE.spawn(GetAllLootMarkers)
 
 
 

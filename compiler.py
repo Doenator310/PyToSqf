@@ -32,7 +32,8 @@ SPECIAL_FUNCTIONS = [{"name":"str", "new":"str", "call":False},
 {"name":"len", "new":"count", "call":False},
 {"name":"print", "new":"hint", "call":False},
 {"name":"pop", "new":"deleteAt", "call": False},
-{"name":"isNil", "new":"isNil", "call": False}]
+{"name":"isNil", "new":"isNil", "call": False},
+{"name":"spawn", "new":"spawn", "call": False}]
 ##############################GLOBAL#FUNCS#####################################
 def isNameInSpecialFunctions(name):
     for entry in SPECIAL_FUNCTIONS:
@@ -358,21 +359,43 @@ class SQFNode:
                 #Build argument list
                 #fr = "(" + self.getChildByRef(funcObj.ref.value).toSyntax() + " "
                 end = ""
-                if len(self.ref.args) > 1:
-                    end = "["
-                elif len(self.ref.args) == 1:
-                    end = "("
+                arg = ""
+                specialArgs = False
+                #CHECK IF SPAWN WAS USED!
+                if specialFunctionData != None:
+                    if specialFunctionData["name"] == "spawn":
+                        specialArgs = True
 
-                for refChild in self.ref.args:
-                    childNodeArg = self.getChildByRef(refChild)
-                    end += childNodeArg.toSyntax()
-                    if refChild != self.ref.args[-1]:
-                        end += ","
+                        arg = "["
 
-                if len(self.ref.args) > 1:
-                    end += "] "
-                elif len(self.ref.args) == 1:
-                    end += ")"
+                        for refChild in self.ref.args[1:]:
+                            childNodeArg = self.getChildByRef(refChild)
+                            arg += childNodeArg.toSyntax()
+                            if refChild != self.ref.args[-1]:
+                                arg += ","
+
+                        arg += "] "
+                        fr = arg + " " + fr
+                        end += "("+ self.getChildByRef(self.ref.args[0]).toSyntax() + ")"
+                #NORMAL CALL!
+                if not specialArgs:
+
+                    if len(self.ref.args) > 1:
+                        arg = "["
+                    elif len(self.ref.args) == 1:
+                        arg = "("
+
+                    for refChild in self.ref.args:
+                        childNodeArg = self.getChildByRef(refChild)
+                        arg += childNodeArg.toSyntax()
+                        if refChild != self.ref.args[-1]:
+                            arg += ","
+
+                    if len(self.ref.args) > 1:
+                        arg += "] "
+                    elif len(self.ref.args) == 1:
+                        arg += ")"
+                    end += arg
 
         elif self.type == ast.arguments:
             #if self.parentNode.type:
