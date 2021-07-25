@@ -20,7 +20,8 @@ firstInit = False
 if(isNil("SOME_MODULE_LOADED") == True):
     STATIC.publicVariable("SOME_MODULE_LOADED")
     firstInit = True
-
+if "x" not in "" or not 1 == 2 :
+    pass
 fun = 1
 await (fun > 1 and fun == 0);
 ENGINE.spawn(GetAllLootMarkers, "A", "B","C")

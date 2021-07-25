@@ -26,6 +26,9 @@ if (isNil("SOME_MODULE_LOADED") == true) then {
    publicVariable("SOME_MODULE_LOADED");
    _firstInit = true;
 };
+if (("x" not in "")||(not(_x == 2))) then {
+
+};
 private _fun = 1;
 waitUntil {(_fun > 1)&&(_fun == 0)};
 ["A","B","C"]  spawn(GetAllLootMarkers);

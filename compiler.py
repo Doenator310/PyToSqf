@@ -12,9 +12,9 @@ if sys.version_info[0] < 3 or sys.version_info[1] < 9:
     raise Exception("Must be using Python 3.9 or newer!")
 #########################GLOBALS#############################
 
-OPERATORS = {ast.Add:"+", ast.Sub:"-", ast.Mult:"*", ast.Div:"/", ast.Mod:"%"}
+OPERATORS = {ast.Add:"+", ast.Sub:"-", ast.Mult:"*", ast.Div:"/", ast.Mod:"%", ast.Not:"not"}
 cmpOPERATORS = {ast.Eq:"==", ast.NotEq :"!=", ast.Lt :"<", ast.LtE  :"<=", ast.Gt :">", ast.GtE  :">=",
-    ast.Is:"==",ast.In:"in", ast.IsNot:"!="}
+    ast.Is:"==",ast.In:"in", ast.IsNot:"!=", ast.NotIn:"not in", ast.Not:"not"}
 boolOperators = {ast.And:"&&", ast.Or:"||"}
 
 SQF_CONTEXT = {}
@@ -300,9 +300,12 @@ class SQFNode:
                 valueNode = self.getChildByRef(self.ref.value)
                 end = valueNode.toSyntax().strip()
                 end += ")];\n"
-
-
-
+        elif self.type == ast.UnaryOp:
+            operator = getOperatorSymbol(type(self.ref.op))
+            content = self.getChildByRef(self.ref.operand)
+            fr = operator
+            m = "("+ content.toSyntax() + ")"
+            end = ""
         elif self.type == ast.Call:
             funcObj = self.getChildByRef(self.ref.func)
             isAttributeFunc = isinstance(funcObj.ref, ast.Attribute)
@@ -365,9 +368,7 @@ class SQFNode:
                 if specialFunctionData != None:
                     if specialFunctionData["name"] == "spawn":
                         specialArgs = True
-
                         arg = "["
-
                         for refChild in self.ref.args[1:]:
                             childNodeArg = self.getChildByRef(refChild)
                             arg += childNodeArg.toSyntax()
