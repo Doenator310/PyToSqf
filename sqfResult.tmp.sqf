@@ -19,8 +19,9 @@ systemchat("TEEEEST!");
    _marker setMarkerAlpha(1);
    _marker setMarkerSizeLocal[10,10];
    if (isNil(_x)) then {
+      private _a = _a + 22;
 
    } else {
-      private _a = 0;
+      _a = 0;
    };
 } forEach _lootMarkerList;
