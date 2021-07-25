@@ -98,10 +98,10 @@ class SQFNode:
         self.isExpression = isinstance(ref, ast.expr)
         self.isMain  = isinstance(ref, ast.mod)
         self.hasCode = hasattr(self.ref, "body")
-        if parent != None:
+        if parent != None and DEBUG:
             print(parent.ref, "<-|" ,self.ref, self.isExpression, type(self.ref).__bases__, self.hasCode)
         pass
-
+#####################HELPER#FUNCTIONS###########################
     def getParentFunction(self):
         lastParent = self.parentNode
         while lastParent != None and lastParent.type != ast.FunctionDef:
@@ -141,7 +141,7 @@ class SQFNode:
             if x.type == typeToSearch:
                 return x
         return None
-
+#####################THE#HEAVY#OR#MAIN#PART##################################
     def toSyntax(self):
         preSpacing = " " * self.deepness * 3
         preSpacingDeeper = " " * (self.deepness +1) * 3
@@ -182,7 +182,6 @@ class SQFNode:
                         end = preSpacing + "}"
                     else:
                         end = preSpacing + "};\n"
-                    print("!!!!!!",vars(self.ref))
                     if hasElse == True:
                         end += " else {\n"
                         if(type(self.ref.orelse[0]) == ast.If):
@@ -193,7 +192,6 @@ class SQFNode:
                                 end += node.toSyntax()
                         end += preSpacing +"};\n"
                 elif self.type == ast.For:
-                    print(vars(self.ref))
                     forEachLoop = True
                     iterSyntax = self.getChildByRef(self.ref.iter).toSyntax();
                     if "range" in iterSyntax:
@@ -240,7 +238,7 @@ class SQFNode:
             else:# if main then start with the file self!
                 for child in self.childNodes:
                     m += child.toSyntax()
-
+#/////////////////////////////////////////
         elif self.type == ast.Expr:
             for child in self.childNodes:
                 m += child.toSyntax()
@@ -248,7 +246,7 @@ class SQFNode:
 
             m = m.strip()
             end.strip()
-
+#/////////////////////////////////////////
         elif self.type in [ast.Assign, ast.AugAssign, ast.AugAssign]:
             nameNode = self.getChildByType(ast.Name)
             targetElement = None
@@ -300,12 +298,14 @@ class SQFNode:
                 valueNode = self.getChildByRef(self.ref.value)
                 end = valueNode.toSyntax().strip()
                 end += ")];\n"
+#/////////////////////////////////////////
         elif self.type == ast.UnaryOp:
             operator = getOperatorSymbol(type(self.ref.op))
             content = self.getChildByRef(self.ref.operand)
             fr = operator
             m = "("+ content.toSyntax() + ")"
             end = ""
+#/////////////////////////////////////////
         elif self.type == ast.Call:
             funcObj = self.getChildByRef(self.ref.func)
             isAttributeFunc = isinstance(funcObj.ref, ast.Attribute)
@@ -397,7 +397,7 @@ class SQFNode:
                     elif len(self.ref.args) == 1:
                         arg += ")"
                     end += arg
-
+#/////////////////////////////////////////
         elif self.type == ast.arguments:
             #if self.parentNode.type:
             fr += "params ["
@@ -406,7 +406,7 @@ class SQFNode:
                 m += child.toSyntax()
                 if child != self.childNodes[-1]:
                     m += ","
-
+#/////////////////////////////////////////
         elif self.type == ast.arg:
             fr, m, end = "\"", "", "\""
             varName = correctVarName(self.ref.arg)
@@ -414,7 +414,7 @@ class SQFNode:
             func = self.getParentFunction()
             addToRegistered(func, varName)
             m = varName # private is not needed here :)
-
+#/////////////////////////////////////////
         elif self.type == ast.Constant:
             fr, m, end = "","",""
             if(str == type(self.ref.value)):
@@ -423,6 +423,7 @@ class SQFNode:
                 m = str(self.ref.value).lower()
             else:
                 m = str(self.ref.value)
+#/////////////////////////////////////////
         elif self.type == ast.BinOp:
             left = self.getChildByRef(self.ref.left)
             right = self.getChildByRef(self.ref.right)
@@ -431,14 +432,17 @@ class SQFNode:
             m = " " + operator.toSyntax() + " "
             end = right.toSyntax() + ")"
 
+#/////////////////////////////////////////
         elif ast.operator in type(self.ref).__bases__:
             fr  = ""
             end =""
             m = getOperatorSymbol(self.type)
+#/////////////////////////////////////////
         elif self.type == ast.Name:
             varName = correctVarName(self.ref.id)
             #Muss noch untersucht werden, macht das hier probleme ohne definitionsüberwachung?
             fr, m, end = "", varName, ""
+#/////////////////////////////////////////
         elif self.type == ast.List:
             fr, end = "[", "]"
             for refChild in self.ref.elts:
@@ -446,6 +450,7 @@ class SQFNode:
                 fr += childNodeArg.toSyntax()
                 if refChild != self.ref.elts[-1]:
                     fr += ","
+#/////////////////////////////////////////
         elif self.type == ast.Subscript:
             childNodeArg = self.getChildByRef(self.ref.slice)
             #check if parent is left side assign!
@@ -466,6 +471,7 @@ class SQFNode:
                 fr = fr + " set ["
                 m = childNodeArg.toSyntax()
                 end = ","
+#/////////////////////////////////////////
         elif self.type == ast.Attribute:
             prefix = self.getChildByRef(self.ref.value).toSyntax()
             fr = ""
@@ -475,10 +481,12 @@ class SQFNode:
             else:
                 raise Exception("Failed attribut access because not implemented yet")
             pass
+#/////////////////////////////////////////
         elif self.type == ast.Pass:
             fr = ""
             m = ""
             end="\n"
+#/////////////////////////////////////////
         elif self.type == ast.Compare:
             fr, m, end = "","",""
             fr = self.getChildByRef(self.ref.left).toSyntax() + " "
@@ -486,7 +494,7 @@ class SQFNode:
                 raise Exception("Not Supported!!!")
             m = getCMPOperatorSymbol(type(self.ref.ops[0]))
             end = " " + self.getChildByRef(self.ref.comparators[0]).toSyntax()
-
+#/////////////////////////////////////////
         elif self.type == ast.BoolOp:
             leftCond = self.getChildByRef(self.ref.values[0])
             rightCond = self.getChildByRef(self.ref.values[1])
@@ -495,28 +503,30 @@ class SQFNode:
             m = symbol
             end = "("+ rightCond.toSyntax() + ")"
             pass
-
+#/////////////////////////////////////////
         elif self.type == ast.Return:
             fr  += "if (true) exitWith {" + self.getChildByRef(self.ref.value).toSyntax() + "};\n";
             pass
-
+#/////////////////////////////////////////
         elif self.type == ast.Await:
             if self.parentNode.hasCode == False and self.parentNode.type != ast.Expr:
                 raise Exception("Invalid placement of await! did you forget to use '()'")
             fr += "waitUntil {"
-            print("WWWWWWWWWWWW",vars(self.ref))
             m += self.getChildByRef(self.ref.value).toSyntax()
             end = "}"
-
+#/////////////////////////////////////////
         elif self.type == ast.Break:
             m,end = "break;","\n"
+#/////////////////////////////////////////
         elif self.type == ast.Continue:
             m,end = "continue;","\n"
+#/////////////////////////////////////////
         else:
             fr, m, end = "","",""
             print("MISSED ", self.type)
-
+#/////////////////////////////////////////
         return fr + m + end
+
 ##################################NODE#CREATOR#########################################
 sqfTree = None
 
@@ -540,18 +550,23 @@ def convertPython3ToSQF(readFile):
     sqfSyntax = sqfNodeTree.toSyntax()
     return sqfSyntax
 ##################################MAIN##############################################
+import os
 if __name__ == "__main__":
     if len (sys.argv) != 3:
         print("Usage: compiler.py fileIn.py fileOut.sqf")
     else:
         fileIn  = sys.argv[1]
         fileOut = sys.argv[2]
+        print()
+        print(f"[i] DebugMode = {DEBUG}")
+        print(f"[i] Converting {os.path.basename(fileIn)} -> to {os.path.basename(fileOut)}!" )
         sqfSource = convertPython3ToSQF(fileIn)
-        with open("sqfResult.tmp.sqf","w") as f:
-            f.write(sqfSource)
+        if DEBUG:
+            with open("sqfResult.tmp.sqf","w") as f:
+                f.write(sqfSource)
         with open(fileOut,"w") as f:
             f.write(sqfSource)
-        print()
+        print("[i] Finished")
         print("#######################################")
         print("################Success################")
         print("#######################################")

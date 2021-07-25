@@ -26,7 +26,7 @@ if (isNil("SOME_MODULE_LOADED") == true) then {
    publicVariable("SOME_MODULE_LOADED");
    _firstInit = true;
 };
-if (("x" not in "")||(not(_x == 2))) then {
+if (("x" not in "")||(not(1 == 2))) then {
 
 };
 private _fun = 1;
