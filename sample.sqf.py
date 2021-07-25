@@ -15,11 +15,8 @@ for marker in lootMarkerList:
     marker.setMarkerColor("ColorYellow");
     marker.setMarkerAlpha(1)
     marker.setMarkerSizeLocal (10, 10)
-    if isNil(x):
-        a += 22
-        pass
-    else:
-        a = 0
+
+await (fun > 1 and fun == 0);
 
 
 

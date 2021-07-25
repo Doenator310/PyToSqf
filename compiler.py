@@ -476,6 +476,14 @@ class SQFNode:
             fr  += "if (true) exitWith {" + self.getChildByRef(self.ref.value).toSyntax() + "};\n";
             pass
 
+        elif self.type == ast.Await:
+            if self.parentNode.hasCode == False and self.parentNode.type != ast.Expr:
+                raise Exception("Invalid placement of await! did you forget to use '()'")
+            fr += "waitUntil {"
+            print("WWWWWWWWWWWW",vars(self.ref))
+            m += self.getChildByRef(self.ref.value).toSyntax()
+            end = "}"
+
         elif self.type == ast.Break:
             m,end = "break;","\n"
         elif self.type == ast.Continue:

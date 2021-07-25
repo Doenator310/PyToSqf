@@ -18,10 +18,5 @@ systemchat("TEEEEST!");
    _marker setMarkerColor("ColorYellow");
    _marker setMarkerAlpha(1);
    _marker setMarkerSizeLocal[10,10];
-   if (isNil(_x)) then {
-      private _a = _a + 22;
-
-   } else {
-      _a = 0;
-   };
 } forEach _lootMarkerList;
+waitUntil {(_fun > 1)&&(_fun == 0)};
