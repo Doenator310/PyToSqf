@@ -8,3 +8,5 @@ its just a proof of concept with a lot of noodle code
 Made in 1 Day..
 
 Be careful if you want to use it, this is really just a prototype of an idea that I had while I was frustrated with sqf.
+
+Python tuples are not fully supported
